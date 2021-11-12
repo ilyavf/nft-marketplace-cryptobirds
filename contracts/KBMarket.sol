@@ -134,9 +134,7 @@ contract KBMarket is ReentrancyGuard {
 
   // function to fetch market items - minting, buying and selling
   // return the number of unsold items
-  function fetchMarketTokens(
-    address nftContract
-  ) public view returns(MarketToken[] memory) {
+  function fetchMarketTokens() public view returns(MarketToken[] memory) {
     uint itemCount = _tokenIds.current();
     uint unsoldItemCount = itemCount - _tokensSold.current();
     uint currentIndex = 0;
@@ -151,5 +149,34 @@ contract KBMarket is ReentrancyGuard {
         currentIndex += 1;
       }
     }
+    return items;
   }
+
+  // return nfts that the user has purchased
+  function fetchMyNfts() public view returns(MarketToken[] memory) {
+    // look through the items and filter for the same owner
+
+    uint totalItemCount = _tokenIds.current();
+    uint myItemsCount = 0;
+    uint currentIndex = 0;
+
+    for (uint i = 0; i < totalItemCount; i++) {
+      if (idToMarketToken[i + 1].owner == msg.sender) {
+        myItemsCount += 1;
+      }
+    }
+
+    // loop over the number of items 
+    MarketToken[] memory items = new MarketToken[](myItemsCount);
+    for(uint i = 0; i < totalItemCount; i++) {
+      if (idToMarketToken[i + 1].owner == msg.sender) {
+        uint currentId = i + 1;
+        MarketToken storage currentItem = idToMarketToken[currentId];
+        items[currentIndex] = currentItem;
+        currentIndex += 1;
+      }
+    }
+    return items;
+  }
+
 }
