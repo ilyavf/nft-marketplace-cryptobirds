@@ -73,5 +73,12 @@ describe("KBMarket", function () {
       return item
     }))
     console.log('items improved: ', items)
+    assert.deepEqual(items, [{
+      price: '100000000000000000000',
+      tokenId: '2',
+      seller: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
+      owner: '0x0000000000000000000000000000000000000000',
+      tokenUri: 'https-t2'
+    }])
   })
 })
