@@ -25,7 +25,7 @@ export default function Home() {
     const tokenContract = new ethers.Contract(nftaddress, NFT.abi, provider)
     const marketContract = new ethers.Contract(nftmarketaddress, KBMarket.abi, provider)
 
-    const data = await marketContract.fetchMarketItems()
+    const data = await marketContract.fetchMarketTokens()
 
     const items = await Promise.all(data.map(async i => {
       const tokenUri = await tokenContract.tokenUri(i.tokenId)
@@ -67,9 +67,44 @@ export default function Home() {
     loadNFTs()
   }
 
+  if (loading == 'loaded' && !nfts.length) {
+    return <h1 className='px-20 py-7 text-4xl'>No NFTs in marketplace</h1>
+  }
+
   return (
-    <div className={styles.container}>
-     
+    <div className='flex justify-center'>
+      <div className='px-4' style={{maxWidth: '160px'}}>
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4'>
+          {
+            nfts.map((nft, i) => (
+              <div key={i} className='border shadow rounded-xl overflow-hidden'>
+                <img src={nft.image} />
+                <div className='p-4'>
+                  <p style={{height: '64px'}} className='text-3xl font-semibold'>
+                    {nft.name}
+                  </p>
+                  <div style={{height: '72px', overflow: 'hidden'}}>
+                    <p className='text-gray-400'>{nft.description}</p>
+                  </div>
+                </div>
+                <div className='p-4 bg-black'>
+                  <p className='text-3xl mb-4 font-bold text-white'>
+                    {nft.price} ETH
+                  </p>
+
+                  <button className='w-full bg-purple-500 text-white font-bold py-3 px-12 rounded'
+                          onClick={() => buyNFT(nft)}>
+                    Buy
+                  </button>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+      <div>
+        {nfts.map(i => JSON.stringify(i)).join('<br>')}
+      </div>
     </div>
   )
 }
