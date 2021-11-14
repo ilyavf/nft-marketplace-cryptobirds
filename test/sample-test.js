@@ -1,4 +1,4 @@
-const { expect } = require("chai");
+const { expect, assert } = require("chai");
 const { ethers } = require("hardhat");
 
 describe("Greeter", function () {
@@ -31,7 +31,7 @@ describe("KBMarket", function () {
 
     let listingPrice = await market.getListingPrice()
     listingPrice = listingPrice.toString()
-    console.log(`listingPrice: ${listingPrice}`)
+    expect(listingPrice).to.equal((45e15).toString())
 
     const auctionPrice = ethers.utils.parseUnits('100', 'ether')
 
@@ -46,16 +46,20 @@ describe("KBMarket", function () {
     // return an array of however many addresses
     const [_, buyerAddress] = await ethers.getSigners()
 
+    let items = await market.fetchMarketTokens()
+    assert.equal(items.length, 2, 'market should list 2 items')
+
     // create a market sale with address, id and price
     await market.connect(buyerAddress).createMarketSale(nftContractAddress, 1, {
       value: auctionPrice
     })
 
-    let items = await market.fetchMarketTokens()
+    items = await market.fetchMarketTokens()
+    assert.equal(items.length, 1, 'market should list 1 items after one was sold')
 
     // test all the items
-    console.log('items: ', items)
 
+    // console.log('items: ', items)
     items = await Promise.all(items.map(async i => {
       // get uri of the value
       const tokenUri = await nft.tokenURI(i.tokenId)
