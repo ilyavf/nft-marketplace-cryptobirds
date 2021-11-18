@@ -1,16 +1,28 @@
 import { ethers } from 'ethers'
-import { useState, useRouter } from 'react'
 import Web3Modal from 'web3modal'
+import { useState } from 'react'
+import { useRouter } from 'next/router'
 
 import { nftaddress, nftmarketaddress } from '../config'
 import NFT from '../artifacts/contracts/NFT.sol/NFT.json'
 import KBMarket from '../artifacts/contracts/KBMarket.sol/KBMarket.json'
 
 import {create as ipfsHttpClient} from 'ipfs-http-client'
+// import { ipfsProjectId, ipfsSecret } from '../config'
 
 // in this component we set ipfs up to host our nft data of file storage
 
-const client = ipfsHttpClient('https://ipfs.infura.io:5001/api/v0/')
+const client = ipfsHttpClient('https://ipfs.infura.io:5001/api/v0')
+// const auth =
+//   'Basic ' + Buffer.from(ipfsProjectId + ':' + ipfsSecret).toString('base64')
+// const client = ipfsHttpClient({
+//   host: 'ipfs.infura.io',
+//   port: '5001',
+//   protocol: 'https',
+//   headers: {
+//     authorization: auth
+//   }
+// })
 
 export default function MintItem() {
   const [fileUrl, setFileUrl] = useState(null)
@@ -27,7 +39,7 @@ export default function MintItem() {
           progress: (prog) => console.log(`received: ${prog}`)
         }
       )
-      const url = `https://ipfs.infura.io:5001/api/v0/${added.path}`
+      const url = `https://ipfs.infura.io/ipfs/${added.path}`
       setFileUrl(url)
     } catch (e) {
       console.log('Error uploading file', e)
@@ -45,7 +57,7 @@ export default function MintItem() {
     })
     try {
       const added = await client.add(data)
-      const url = `https://ipfs.infura.io:5001/api/v0/${added.path}`
+      const url = `https://ipfs.infura.io/ipfs/${added.path}`
       // run a function that creates sale and passes in the url
       createSale(url)
     } catch (e) {
@@ -67,7 +79,7 @@ export default function MintItem() {
     let event = tx.events[0]
     let value = event.args[2]
     let tokenId = value.toNumber()
-    const price = ethers.utils.parseUnits(formatInput.price, 'ether')
+    const price = ethers.utils.parseUnits(formInput.price, 'ether')
 
     // list the item for sale on the marketplace
     contract = new ethers.Contract(nftmarketaddress, KBMarket.abi, signer)

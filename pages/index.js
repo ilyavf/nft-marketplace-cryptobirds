@@ -14,12 +14,13 @@ export default function Home() {
 
   useEffect(() => {
     loadNFTs()
-  })
+  }, [])
 
   // Section 4, video 27.
   async function loadNFTs() {
     // What we want to load:
     // provider, tokenContract, marketContract, data for our marketItems
+    console.log('[loadNFTs]...')
 
     const provider = new ethers.providers.JsonRpcProvider()
     const tokenContract = new ethers.Contract(nftaddress, NFT.abi, provider)
@@ -28,7 +29,7 @@ export default function Home() {
     const data = await marketContract.fetchMarketTokens()
 
     const items = await Promise.all(data.map(async i => {
-      const tokenUri = await tokenContract.tokenUri(i.tokenId)
+      const tokenUri = await tokenContract.tokenURI(i.tokenId)
       // we want to get the token metadata - json
       const meta = await axios.get(tokenUri)
       let price = ethers.utils.formatUnits(i.price.toString(), 'ether')
@@ -46,6 +47,7 @@ export default function Home() {
 
     setNfts(items)
     setLoading('loaded')
+    console.log(`- loaded ${items.length} items`)
   }
 
   // function to buy nfts for market
@@ -72,12 +74,12 @@ export default function Home() {
   }
 
   return (
-    <div className='flex justify-center'>
-      <div className='px-4' style={{maxWidth: '160px'}}>
+    <div className='flex justify-center mt-10'>
+      <div className='px-4'>
         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4'>
           {
             nfts.map((nft, i) => (
-              <div key={i} className='border shadow rounded-xl overflow-hidden'>
+              <div key={i} className='border shadow rounded-xl' style={{maxWidth: '260px'}}>
                 <img src={nft.image} />
                 <div className='p-4'>
                   <p style={{height: '64px'}} className='text-3xl font-semibold'>
@@ -102,9 +104,9 @@ export default function Home() {
           }
         </div>
       </div>
-      <div>
+      {/* <div>
         {nfts.map(i => JSON.stringify(i)).join('<br>')}
-      </div>
+      </div> */}
     </div>
   )
 }
