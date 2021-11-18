@@ -14,7 +14,7 @@ function KBMarketplace({ Component, pageProps }) {
           <Link href='/mint-item'>
             <a className='mr-6'>Mint Tokens</a>
           </Link>
-          <Link href='/my-nft'>
+          <Link href='/my-nfts'>
             <a className='mr-6'>My NFTs</a>
           </Link>
           <Link href='/dashboard'>
