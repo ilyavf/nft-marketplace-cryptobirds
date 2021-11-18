@@ -7,6 +7,12 @@ import '@openzeppelin/contracts/utils/Counters.sol';
 // security against transactions for multiple requests
 import 'hardhat/console.sol';
 
+
+function toBytes(uint256 x) returns (bytes memory b) {
+  b = new bytes(32);
+  assembly { mstore(add(b, 32), x) }
+}
+
 contract KBMarket is ReentrancyGuard {
   using Counters for Counters.Counter;
 
@@ -116,7 +122,8 @@ contract KBMarket is ReentrancyGuard {
     uint price = idToMarketToken[itemId].price;
     uint tokenId = idToMarketToken[itemId].tokenId;
 
-    require(msg.value == price, 'Please submit the asking price');
+    // require(msg.value == price, string('Please submit the asking price'));
+    require(msg.value == price, string(bytes.concat(bytes('Please submit the asking price: value/price: '), toBytes(msg.value), bytes(' / '), toBytes(price))));
 
     // transfer amount to the seller
     idToMarketToken[itemId].seller.transfer(msg.value);

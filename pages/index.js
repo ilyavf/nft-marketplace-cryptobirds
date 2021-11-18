@@ -52,6 +52,7 @@ export default function Home() {
 
   // function to buy nfts for market
   async function buyNFT(nft) {
+    console.log('[buyNFT] ...', nft)
     // connect to Metamask
     const web3Modal= new Web3Modal()
     const connection = await web3Modal.connect()
@@ -60,6 +61,7 @@ export default function Home() {
     const contract = new ethers.Contract(nftmarketaddress, KBMarket.abi, signer)
 
     const price = ethers.utils.parseUnits(nft.price.toString(), 'ether')
+    console.log(`- price = ${price}`)
     const transaction = await contract.createMarketSale(nftaddress, nft.tokenId, {
       value: price
     })
