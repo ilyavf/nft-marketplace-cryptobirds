@@ -9,15 +9,16 @@ import { nftaddress, nftmarketaddress } from '../config'
 import NFT from '../artifacts/contracts/NFT.sol/NFT.json'
 import KBMarket from '../artifacts/contracts/KBMarket.sol/KBMarket.json'
 
-export default function MyAssets() {
+export default function MyDashboard() {
   const [nfts, setNfts] = useState([])
+  const [sold, setSold] = useState([])
   const [loading, setLoading] = useState('not-loaded')
 
   useEffect(() => {
     loadNFTs()
   }, [])
 
-  // Section 4, video 27.
+  // Section 4, video 35.
   async function loadNFTs() {
     // What we want to load:
     // provider, tokenContract, marketContract, data for our marketItems
@@ -36,7 +37,7 @@ export default function MyAssets() {
     // no difference if we use provider or signer below:
     const marketContract = new ethers.Contract(nftmarketaddress, KBMarket.abi, signer) 
 
-    const data = await marketContract.fetchMyNfts()
+    const data = await marketContract.fetchNftsCreated()
 
     const items = await Promise.all(data.map(async i => {
       const tokenUri = await tokenContract.tokenURI(i.tokenId)
@@ -55,17 +56,21 @@ export default function MyAssets() {
       return item
     }))
 
+    // Create a filtered array of items that have been sold
+    const soldItems = items.filter(i => i.sold)
+    setSold(soldItems)
     setNfts(items)
     setLoading('loaded')
     console.log(`- loaded ${items.length} items`)
   }
 
   if (loading == 'loaded' && !nfts.length) {
-    return <h1 className='px-20 py-7 text-4xl'>You do not own any NFTs currently</h1>
+    return <h1 className='px-20 py-7 text-4xl'>You have not minted any NFTs</h1>
   }
 
   return (
-    <div className='flex justify-center mt-10'>
+    <div className='p-4'>
+      <h2 class='text-lg text-purple-600 text-center'>Tokens minted</h2>
       <div className='px-4'>
         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4'>
           {
